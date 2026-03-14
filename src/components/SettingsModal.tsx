@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { AIConfig } from "@/lib/types";
 import { loadAIConfig, saveAIConfig } from "@/lib/storage";
 
@@ -10,23 +10,16 @@ interface SettingsModalProps {
   onSave: (config: AIConfig) => void;
 }
 
-export default function SettingsModal({
-  isOpen,
+function SettingsForm({
   onClose,
   onSave,
-}: SettingsModalProps) {
-  const [apiKey, setApiKey] = useState("");
-  const [model, setModel] = useState("gemini-2.0-flash");
-
-  useEffect(() => {
-    if (isOpen) {
-      const config = loadAIConfig();
-      if (config) {
-        setApiKey(config.apiKey);
-        setModel(config.model);
-      }
-    }
-  }, [isOpen]);
+}: {
+  onClose: () => void;
+  onSave: (config: AIConfig) => void;
+}) {
+  const savedConfig = useMemo(() => loadAIConfig(), []);
+  const [apiKey, setApiKey] = useState(savedConfig?.apiKey ?? "");
+  const [model, setModel] = useState(savedConfig?.model ?? "gemini-2.0-flash");
 
   const handleSave = () => {
     const config: AIConfig = {
@@ -38,8 +31,6 @@ export default function SettingsModal({
     onSave(config);
     onClose();
   };
-
-  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -113,4 +104,14 @@ export default function SettingsModal({
       </div>
     </div>
   );
+}
+
+export default function SettingsModal({
+  isOpen,
+  onClose,
+  onSave,
+}: SettingsModalProps) {
+  if (!isOpen) return null;
+
+  return <SettingsForm onClose={onClose} onSave={onSave} />;
 }

@@ -1,4 +1,4 @@
-import { GeneratedObject, CanvasVersion, CanvasObject, AIConfig } from "./types";
+import { GeneratedObject, CanvasVersion, AIConfig } from "./types";
 
 const ASSET_LIBRARY_KEY = "nature_laws_assets";
 const VERSIONS_KEY = "nature_laws_versions";

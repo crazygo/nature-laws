@@ -3,11 +3,8 @@ import { GeneratedObject } from "./types";
 
 const {
   Engine,
-  World,
   Bodies,
-  Body,
   Composite,
-  Events,
   Mouse,
   MouseConstraint,
   Runner,

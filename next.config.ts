@@ -1,8 +1,10 @@
 import type { NextConfig } from "next";
 
+const isProd = process.env.GITHUB_ACTIONS === "true";
+
 const nextConfig: NextConfig = {
   output: "export",
-  basePath: "/nature-laws",
+  basePath: isProd ? "/nature-laws" : "",
   images: {
     unoptimized: true,
   },

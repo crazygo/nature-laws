@@ -28,6 +28,7 @@ export default function VersionPanel({
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white text-xl"
+            aria-label="Close saved versions"
           >
             ×
           </button>

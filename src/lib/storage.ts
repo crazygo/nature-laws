@@ -16,7 +16,11 @@ export function loadAssets(): GeneratedObject[] {
 
 export function saveAssets(assets: GeneratedObject[]): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(ASSET_LIBRARY_KEY, JSON.stringify(assets));
+  try {
+    localStorage.setItem(ASSET_LIBRARY_KEY, JSON.stringify(assets));
+  } catch {
+    // Quota exceeded or storage unavailable — silently ignore
+  }
 }
 
 export function loadVersions(): CanvasVersion[] {
@@ -31,7 +35,11 @@ export function loadVersions(): CanvasVersion[] {
 
 export function saveVersions(versions: CanvasVersion[]): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(VERSIONS_KEY, JSON.stringify(versions));
+  try {
+    localStorage.setItem(VERSIONS_KEY, JSON.stringify(versions));
+  } catch {
+    // Quota exceeded or storage unavailable — silently ignore
+  }
 }
 
 export function loadAIConfig(): AIConfig | null {
@@ -46,5 +54,9 @@ export function loadAIConfig(): AIConfig | null {
 
 export function saveAIConfig(config: AIConfig): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(AI_CONFIG_KEY, JSON.stringify(config));
+  try {
+    localStorage.setItem(AI_CONFIG_KEY, JSON.stringify(config));
+  } catch {
+    // Quota exceeded or storage unavailable — silently ignore
+  }
 }

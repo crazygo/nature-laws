@@ -1,11 +1,8 @@
 "use client";
 
 import React from "react";
-import { PhysicsWorld } from "@/lib/physics";
 
 interface ToolbarProps {
-  physicsWorld: PhysicsWorld | null;
-  canvasHeight: number;
   onTestStability: () => void;
   onSaveVersion: () => void;
   onClearCanvas: () => void;

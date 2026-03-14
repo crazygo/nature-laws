@@ -99,6 +99,21 @@ describe("physics", () => {
 
       Matter.Engine.clear(engine);
     });
+
+    it("applies optional angle and velocity", () => {
+      const engine = createTestEngine();
+      const body = addObjectToWorld(engine, testAsset, 200, 100, {
+        angle: Math.PI / 4,
+        velocityX: 2,
+        velocityY: -1,
+      });
+
+      expect(body.angle).toBeCloseTo(Math.PI / 4);
+      expect(body.velocity.x).toBeCloseTo(2);
+      expect(body.velocity.y).toBeCloseTo(-1);
+
+      Matter.Engine.clear(engine);
+    });
   });
 
   describe("clearWorld", () => {

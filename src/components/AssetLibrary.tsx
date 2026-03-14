@@ -14,6 +14,23 @@ function AssetThumbnail({ asset }: { asset: GeneratedObject }) {
     e.dataTransfer.effectAllowed = "copy";
   };
 
+  const renderShape = () => {
+    if (asset.svg_path) {
+      return (
+        <path d={asset.svg_path} fill={asset.color} stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+      );
+    }
+    if (asset.shape_type === "circle") {
+      const r = Math.min(asset.width, asset.height) / 2;
+      return (
+        <circle cx={asset.width / 2} cy={asset.height / 2} r={r} fill={asset.color} stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+      );
+    }
+    return (
+      <rect x={0} y={0} width={asset.width} height={asset.height} fill={asset.color} stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+    );
+  };
+
   return (
     <div
       draggable
@@ -27,7 +44,7 @@ function AssetThumbnail({ asset }: { asset: GeneratedObject }) {
           className="w-full h-full"
           style={{ maxWidth: 80, maxHeight: 80 }}
         >
-          <path d={asset.svg_path} fill={asset.color} stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+          {renderShape()}
         </svg>
       </div>
       <p className="text-xs text-gray-300 truncate text-center">{asset.name}</p>
@@ -68,7 +85,7 @@ export default function AssetLibrary({
               <button
                 onClick={() => onRemoveAsset(asset.id)}
                 className="absolute top-1 right-1 w-5 h-5 bg-red-600 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-500"
-                title="Remove from library"
+                aria-label="Remove from library"
               >
                 ×
               </button>

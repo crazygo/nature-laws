@@ -11,7 +11,7 @@ import ToastContainer from "@/components/ToastContainer";
 import SettingsModal from "@/components/SettingsModal";
 import { GeneratedObject, CanvasVersion, Toast, AIConfig, CanvasObject } from "@/lib/types";
 import { generateObject, createFallbackObject } from "@/lib/llm";
-import { PhysicsWorld, checkStability, clearWorld } from "@/lib/physics";
+import { PhysicsWorld, checkStability, clearWorld, addObjectToWorld } from "@/lib/physics";
 import {
   loadAssets,
   saveAssets,
@@ -40,12 +40,22 @@ export default function Home() {
   } | null>(null);
 
   const physicsWorldRef = useRef<PhysicsWorld | null>(null);
+  const testIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Load persisted data
   useEffect(() => {
     setAssets(loadAssets());
     setVersions(loadVersions());
     setAiConfig(loadAIConfig());
+  }, []);
+
+  // Cleanup test interval on unmount
+  useEffect(() => {
+    return () => {
+      if (testIntervalRef.current) {
+        clearInterval(testIntervalRef.current);
+      }
+    };
   }, []);
 
   const addToast = useCallback(
@@ -118,16 +128,24 @@ export default function Home() {
   const handleTestStability = useCallback(() => {
     if (!physicsWorldRef.current || isTesting) return;
 
+    // Clear any previous interval
+    if (testIntervalRef.current) {
+      clearInterval(testIntervalRef.current);
+    }
+
     setIsTesting(true);
     setTestCountdown(3);
 
     let count = 3;
-    const interval = setInterval(() => {
+    testIntervalRef.current = setInterval(() => {
       count--;
       setTestCountdown(count);
 
       if (count <= 0) {
-        clearInterval(interval);
+        if (testIntervalRef.current) {
+          clearInterval(testIntervalRef.current);
+        }
+        testIntervalRef.current = null;
         const isStable = checkStability(
           physicsWorldRef.current!.engine,
           CANVAS_HEIGHT
@@ -195,11 +213,15 @@ export default function Home() {
       if (!physicsWorldRef.current) return;
       clearWorld(physicsWorldRef.current.engine);
 
-      // Re-add objects from version
+      // Add all objects directly to the physics world
       for (const obj of version.objects) {
         const asset = assets.find((a) => a.id === obj.assetId);
         if (asset) {
-          setDroppingAsset({ asset, x: obj.x, y: obj.y });
+          addObjectToWorld(physicsWorldRef.current.engine, asset, obj.x, obj.y, {
+            angle: obj.angle,
+            velocityX: obj.velocityX,
+            velocityY: obj.velocityY,
+          });
         }
       }
 
@@ -258,8 +280,6 @@ export default function Home() {
         <main className="flex-1 flex flex-col p-4 gap-4">
           {/* Toolbar */}
           <Toolbar
-            physicsWorld={physicsWorldRef.current}
-            canvasHeight={CANVAS_HEIGHT}
             onTestStability={handleTestStability}
             onSaveVersion={handleSaveVersion}
             onClearCanvas={handleClearCanvas}

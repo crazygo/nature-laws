@@ -89,7 +89,8 @@ export function addObjectToWorld(
   engine: Matter.Engine,
   asset: GeneratedObject,
   x: number,
-  y: number
+  y: number,
+  options?: { angle?: number; velocityX?: number; velocityY?: number }
 ): Matter.Body {
   let body: Matter.Body;
 
@@ -132,6 +133,17 @@ export function addObjectToWorld(
   }
 
   Composite.add(engine.world, body);
+
+  if (options?.angle !== undefined) {
+    Matter.Body.setAngle(body, options.angle);
+  }
+  if (options?.velocityX !== undefined || options?.velocityY !== undefined) {
+    Matter.Body.setVelocity(body, {
+      x: options?.velocityX ?? 0,
+      y: options?.velocityY ?? 0,
+    });
+  }
+
   return body;
 }
 

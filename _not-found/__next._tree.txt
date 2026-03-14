@@ -1,0 +1,2 @@
+:HL["/nature-laws/_next/static/chunks/614c2fc277e4a184.css","style"]
+0:{"buildId":"HXqiagYtZ3iT3sbo09xkp","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"/_not-found","paramType":null,"paramKey":"/_not-found","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}

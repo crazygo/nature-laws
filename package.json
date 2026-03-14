@@ -9,7 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "deploy": "npm run build && gh-pages -d out"
+    "deploy": "npm run build && gh-pages -d out --nojekyll"
   },
   "dependencies": {
     "matter-js": "^0.20.0",

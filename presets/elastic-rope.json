@@ -1,0 +1,23 @@
+{
+  "id": "preset-elastic-rope",
+  "name": "Elastic Rope",
+  "description": "Stretchable constraint that stores potential energy",
+  "category": "constraint",
+  "pending": true,
+  "svg_path": "M0,0.1 Q0.5,0 1,0.1 Q0.5,0.2 0,0.1 Z",
+  "width": 1.0,
+  "height": 0.2,
+  "color": "#F59E0B",
+  "mass": 0.1,
+  "friction": 0.1,
+  "frictionStatic": 0.1,
+  "restitution": 0.9,
+  "density": 0.0005,
+  "shape_type": "polygon",
+  "vertices": [
+    { "x": 0, "y": 0 },
+    { "x": 1.0, "y": 0 },
+    { "x": 1.0, "y": 0.2 },
+    { "x": 0, "y": 0.2 }
+  ]
+}

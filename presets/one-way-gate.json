@@ -1,0 +1,27 @@
+{
+  "id": "preset-one-way-gate",
+  "name": "One-way Gate",
+  "description": "Allows passage in one direction only",
+  "category": "mechanism",
+  "pending": true,
+  "svg_path": "M0,0.3 L0.7,0.3 L0.7,0 L1,0.5 L0.7,1 L0.7,0.7 L0,0.7 Z",
+  "width": 1.0,
+  "height": 1.0,
+  "color": "#7C3AED",
+  "mass": 0.5,
+  "friction": 0.1,
+  "frictionStatic": 0.1,
+  "restitution": 0.0,
+  "density": 0.002,
+  "isStatic": true,
+  "shape_type": "polygon",
+  "vertices": [
+    { "x": 0, "y": 0.3 },
+    { "x": 0.7, "y": 0.3 },
+    { "x": 0.7, "y": 0 },
+    { "x": 1.0, "y": 0.5 },
+    { "x": 0.7, "y": 1.0 },
+    { "x": 0.7, "y": 0.7 },
+    { "x": 0, "y": 0.7 }
+  ]
+}

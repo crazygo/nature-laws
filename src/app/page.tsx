@@ -12,6 +12,7 @@ import SettingsModal from "@/components/SettingsModal";
 import { GeneratedObject, CanvasVersion, Toast, AIConfig, CanvasObject } from "@/lib/types";
 import { generateObject, createFallbackObject } from "@/lib/llm";
 import { PhysicsWorld, checkStability, clearWorld, addObjectToWorld } from "@/lib/physics";
+import { PRESETS } from "@/lib/presets";
 import {
   loadAssets,
   saveAssets,
@@ -273,7 +274,7 @@ export default function Home() {
       <div className="flex-1 flex max-w-7xl mx-auto w-full">
         {/* Asset Library Sidebar */}
         <aside className="w-48 border-r border-gray-800 bg-gray-900/50">
-          <AssetLibrary assets={assets} onRemoveAsset={handleRemoveAsset} />
+          <AssetLibrary assets={assets} presets={PRESETS} onRemoveAsset={handleRemoveAsset} />
         </aside>
 
         {/* Canvas area */}
@@ -295,6 +296,7 @@ export default function Home() {
               width={CANVAS_WIDTH}
               height={CANVAS_HEIGHT}
               assets={assets}
+              presets={PRESETS}
               onWorldReady={handleWorldReady}
               droppingAsset={droppingAsset}
               onDropComplete={handleDropComplete}

@@ -1,0 +1,16 @@
+{
+  "id": "preset-ball-basketball",
+  "name": "Basketball",
+  "description": "High elasticity orange sphere",
+  "category": "ball",
+  "svg_path": "",
+  "width": 0.24,
+  "height": 0.24,
+  "color": "#E8671A",
+  "mass": 0.62,
+  "friction": 0.5,
+  "frictionStatic": 0.6,
+  "restitution": 0.85,
+  "density": 0.0005,
+  "shape_type": "circle"
+}

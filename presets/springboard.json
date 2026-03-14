@@ -1,0 +1,22 @@
+{
+  "id": "preset-springboard",
+  "name": "Springboard",
+  "description": "High restitution bouncing surface",
+  "category": "surface",
+  "svg_path": "M0,0 L1.5,0 L1.5,0.15 L0,0.15 Z",
+  "width": 1.5,
+  "height": 0.15,
+  "color": "#22C55E",
+  "mass": 2,
+  "friction": 0.3,
+  "frictionStatic": 0.4,
+  "restitution": 0.9,
+  "density": 0.002,
+  "shape_type": "polygon",
+  "vertices": [
+    { "x": 0, "y": 0 },
+    { "x": 1.5, "y": 0 },
+    { "x": 1.5, "y": 0.15 },
+    { "x": 0, "y": 0.15 }
+  ]
+}

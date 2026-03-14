@@ -11,10 +11,15 @@ import {
 import { GeneratedObject } from "@/lib/types";
 import { SCALE, toUnits } from "@/lib/units";
 
+/** Environment-owned static bodies that should not be drawn by the user renderer. */
+const ENV_LABELS = new Set(["ground", "wallLeft", "wallRight"]);
+
 interface PhysicsCanvasProps {
   width: number;
   height: number;
   assets: GeneratedObject[];
+  /** Preset objects available for drag-drop in addition to user assets. */
+  presets?: GeneratedObject[];
   onWorldReady: (world: PhysicsWorld) => void;
   droppingAsset: { asset: GeneratedObject; x: number; y: number } | null;
   onDropComplete: () => void;
@@ -24,6 +29,7 @@ export default function PhysicsCanvas({
   width,
   height,
   assets,
+  presets = [],
   onWorldReady,
   droppingAsset,
   onDropComplete,
@@ -32,11 +38,16 @@ export default function PhysicsCanvas({
   const worldRef = useRef<PhysicsWorld | null>(null);
   const renderLoopRef = useRef<number | null>(null);
   const assetsRef = useRef<GeneratedObject[]>(assets);
+  const presetsRef = useRef<GeneratedObject[]>(presets);
 
-  // Keep assetsRef in sync
+  // Keep refs in sync
   useEffect(() => {
     assetsRef.current = assets;
   }, [assets]);
+
+  useEffect(() => {
+    presetsRef.current = presets;
+  }, [presets]);
 
   // Initialize physics world and render loop
   useEffect(() => {
@@ -74,11 +85,14 @@ export default function PhysicsCanvas({
 
       // Draw all bodies
       const currentAssets = assetsRef.current;
+      const currentPresets = presetsRef.current;
+      const allObjects = [...currentAssets, ...currentPresets];
       const bodies = Matter.Composite.allBodies(worldRef.current.engine.world);
       for (const body of bodies) {
-        if (body.isStatic) continue;
+        // Skip environment static bodies (ground, walls); draw user-placed statics
+        if (body.isStatic && ENV_LABELS.has(body.label)) continue;
 
-        const asset = currentAssets.find((a) => a.id === body.label);
+        const asset = allObjects.find((a) => a.id === body.label);
 
         ctx.save();
         ctx.translate(body.position.x, body.position.y);
@@ -187,7 +201,9 @@ export default function PhysicsCanvas({
       const assetId = e.dataTransfer.getData("assetId");
       if (!assetId || !worldRef.current) return;
 
-      const asset = assets.find((a) => a.id === assetId);
+      const asset =
+        assets.find((a) => a.id === assetId) ??
+        presets.find((p) => p.id === assetId);
       if (!asset) return;
 
       const rect = canvasRef.current?.getBoundingClientRect();
@@ -198,7 +214,7 @@ export default function PhysicsCanvas({
 
       addObjectToWorld(worldRef.current.engine, asset, x, y);
     },
-    [assets]
+    [assets, presets]
   );
 
   return (

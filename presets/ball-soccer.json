@@ -1,0 +1,16 @@
+{
+  "id": "preset-ball-soccer",
+  "name": "Soccer Ball",
+  "description": "Medium elasticity sphere, standard football",
+  "category": "ball",
+  "svg_path": "",
+  "width": 0.22,
+  "height": 0.22,
+  "color": "#EFEFEF",
+  "mass": 0.43,
+  "friction": 0.4,
+  "frictionStatic": 0.5,
+  "restitution": 0.6,
+  "density": 0.0005,
+  "shape_type": "circle"
+}

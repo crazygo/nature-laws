@@ -7,8 +7,8 @@ describe("llm", () => {
       const obj = createFallbackObject("wooden table");
       expect(obj.name).toBe("Wooden table");
       expect(obj.description).toBe("wooden table");
-      expect(obj.width).toBe(60);
-      expect(obj.height).toBe(60);
+      expect(obj.width).toBeCloseTo(0.6);
+      expect(obj.height).toBeCloseTo(0.6);
       expect(obj.shape_type).toBe("polygon");
       expect(obj.vertices).toHaveLength(4);
       expect(obj.id).toBeTruthy();

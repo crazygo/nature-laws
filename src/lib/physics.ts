@@ -1,5 +1,6 @@
 import Matter from "matter-js";
 import { GeneratedObject } from "./types";
+import { SCALE, toUnits } from "./units";
 
 const {
   Engine,
@@ -25,7 +26,9 @@ export function createPhysicsWorld(
   height: number
 ): PhysicsWorld {
   const engine = Engine.create({
-    gravity: { x: 0, y: 1, scale: 0.001 },
+    // Realistic gravity: 9.81 m/s² expressed in Matter.js units.
+    // gravity.scale = g * SCALE / (1000 ms/s)^2, giving ~9.81 m/s² at SCALE=50.
+    gravity: { x: 0, y: 1, scale: (9.81 * SCALE) / 1e6 },
   });
 
   const wallThickness = 50;
@@ -95,7 +98,7 @@ export function addObjectToWorld(
   let body: Matter.Body;
 
   if (asset.shape_type === "circle") {
-    const radius = Math.min(asset.width, asset.height) / 2;
+    const radius = toUnits(Math.min(asset.width, asset.height) / 2);
     body = Bodies.circle(x, y, radius, {
       label: asset.id,
       density: asset.density,
@@ -110,8 +113,8 @@ export function addObjectToWorld(
     asset.vertices.length >= 3
   ) {
     const centeredVertices = asset.vertices.map((v) => ({
-      x: v.x - asset.width / 2,
-      y: v.y - asset.height / 2,
+      x: toUnits(v.x) - toUnits(asset.width) / 2,
+      y: toUnits(v.y) - toUnits(asset.height) / 2,
     }));
     body = Bodies.fromVertices(x, y, [centeredVertices], {
       label: asset.id,
@@ -122,7 +125,7 @@ export function addObjectToWorld(
       render: { fillStyle: asset.color },
     });
   } else {
-    body = Bodies.rectangle(x, y, asset.width, asset.height, {
+    body = Bodies.rectangle(x, y, toUnits(asset.width), toUnits(asset.height), {
       label: asset.id,
       density: asset.density,
       friction: asset.friction,

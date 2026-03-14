@@ -9,6 +9,7 @@ import {
   PhysicsWorld,
 } from "@/lib/physics";
 import { GeneratedObject } from "@/lib/types";
+import { SCALE, toUnits } from "@/lib/units";
 
 interface PhysicsCanvasProps {
   width: number;
@@ -90,9 +91,10 @@ export default function PhysicsCanvas({
           ctx.lineWidth = 1;
 
           const path = new Path2D(asset.svg_path);
-          // Translate to center the SVG
+          // Translate to center the SVG and scale from meters to units
           ctx.save();
-          ctx.translate(-asset.width / 2, -asset.height / 2);
+          ctx.translate(-toUnits(asset.width) / 2, -toUnits(asset.height) / 2);
+          ctx.scale(SCALE, SCALE);
           ctx.fill(path);
           ctx.stroke(path);
           ctx.restore();
@@ -125,7 +127,7 @@ export default function PhysicsCanvas({
           ctx.fillStyle = "rgba(255,255,255,0.8)";
           ctx.font = "10px sans-serif";
           ctx.textAlign = "center";
-          ctx.fillText(asset.name, 0, -asset.height / 2 - 5);
+          ctx.fillText(asset.name, 0, -toUnits(asset.height) / 2 - 5);
         }
 
         ctx.restore();

@@ -2,16 +2,21 @@ export interface GeneratedObject {
   id: string;
   name: string;
   description: string;
+  /** SVG path with coordinates in meters, matching the width × height bounding box */
   svg_path: string;
+  /** Width in meters */
   width: number;
+  /** Height in meters */
   height: number;
   color: string;
+  /** Mass in kg */
   mass: number;
   friction: number;
   frictionStatic: number;
   restitution: number;
   density: number;
   shape_type: "polygon" | "circle" | "composite";
+  /** Vertices in meters, required for polygon shape_type */
   vertices?: Array<{ x: number; y: number }>;
 }
 

@@ -152,10 +152,14 @@ export function removeBodyFromWorld(
   Composite.remove(engine.world, body);
 }
 
+/** Labels of physics-world environment bodies that should never be saved, restored, or removed by user actions. */
+export const ENV_BODY_LABELS = new Set(["ground", "wallLeft", "wallRight"]);
+
 export function clearWorld(engine: Matter.Engine): void {
   const bodies = Composite.allBodies(engine.world);
-  const dynamicBodies = bodies.filter((b) => !b.isStatic);
-  for (const body of dynamicBodies) {
+  // Remove all bodies that are not environment bodies (dynamic and user-placed statics)
+  const removable = bodies.filter((b) => !ENV_BODY_LABELS.has(b.label));
+  for (const body of removable) {
     Composite.remove(engine.world, body);
   }
 }

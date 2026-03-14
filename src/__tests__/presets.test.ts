@@ -8,8 +8,26 @@ describe("presets", () => {
       expect(PRESETS.length).toBeGreaterThan(0);
     });
 
-    it("contains 17 components", () => {
-      expect(PRESETS).toHaveLength(17);
+    it("includes all initial preset ids", () => {
+      const ids = PRESETS.map((p) => p.id);
+      // Verify specific required preset IDs rather than a hard-coded count
+      expect(ids).toContain("preset-cube");
+      expect(ids).toContain("preset-plank");
+      expect(ids).toContain("preset-ball-soccer");
+      expect(ids).toContain("preset-ball-basketball");
+      expect(ids).toContain("preset-ramp");
+      expect(ids).toContain("preset-springboard");
+      expect(ids).toContain("preset-fixed-platform");
+      expect(ids).toContain("preset-wall");
+      expect(ids).toContain("preset-hinge");
+      expect(ids).toContain("preset-elastic-rope");
+      expect(ids).toContain("preset-switch-trigger");
+      expect(ids).toContain("preset-conveyor-belt");
+      expect(ids).toContain("preset-magnet");
+      expect(ids).toContain("preset-gear");
+      expect(ids).toContain("preset-one-way-gate");
+      expect(ids).toContain("preset-gravity-zone");
+      expect(ids).toContain("preset-lego-figure");
     });
 
     it("every preset has required fields", () => {
@@ -61,18 +79,6 @@ describe("presets", () => {
 
     it("has at least 8 native presets", () => {
       expect(nativePresets.length).toBeGreaterThanOrEqual(8);
-    });
-
-    it("includes core components", () => {
-      const ids = nativePresets.map((p) => p.id);
-      expect(ids).toContain("preset-cube");
-      expect(ids).toContain("preset-plank");
-      expect(ids).toContain("preset-ball-soccer");
-      expect(ids).toContain("preset-ball-basketball");
-      expect(ids).toContain("preset-ramp");
-      expect(ids).toContain("preset-springboard");
-      expect(ids).toContain("preset-fixed-platform");
-      expect(ids).toContain("preset-wall");
     });
 
     it("static presets (fixed-platform, wall) have isStatic=true", () => {

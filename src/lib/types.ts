@@ -27,8 +27,9 @@ export interface Preset extends GeneratedObject {
   /** Category grouping for display in the preset library */
   category: string;
   /**
-   * When true the special behaviour for this component is not yet implemented.
-   * The object can still be placed on the canvas with basic physics.
+   * When true, the special behaviour for this component is not yet implemented.
+   * The preset will be shown greyed-out with a "soon" badge and cannot be dragged
+   * onto the canvas until the behaviour is implemented.
    */
   pending?: boolean;
 }

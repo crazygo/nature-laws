@@ -33,10 +33,11 @@ Make the shapes realistic but simple enough for a physics engine.`;
 
 export async function generateObject(
   description: string,
-  apiKey: string
+  apiKey: string,
+  model: string = "gemini-2.0-flash"
 ): Promise<GeneratedObject> {
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${apiKey}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },

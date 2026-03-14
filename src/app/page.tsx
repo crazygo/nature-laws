@@ -75,7 +75,7 @@ export default function Home() {
 
       setIsLoading(true);
       try {
-        const obj = await generateObject(description, config.apiKey);
+        const obj = await generateObject(description, config.apiKey, config.model);
         setAssets((prev) => {
           const next = [...prev, obj];
           saveAssets(next);

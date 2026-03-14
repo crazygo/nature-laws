@@ -6,8 +6,8 @@ Given a description of an object, generate a JSON object with these properties:
 - name: A clean, title-cased name for the object
 - description: Brief description of the object
 - svg_path: An SVG path string (d attribute) that represents the object's silhouette. The path should be a closed shape within a coordinate system where (0,0) is top-left and coordinates are in meters matching the width × height bounding box. Keep paths simple (under 30 vertices).
-- width: Width in meters (0.02-5.0)
-- height: Height in meters (0.02-5.0)
+- width: Width in meters (0.2-5.0)
+- height: Height in meters (0.2-5.0)
 - color: A hex color string representing the object's primary color
 - mass: Mass in kg (0.1-100)
 - friction: Friction coefficient (0-1)
@@ -87,8 +87,8 @@ export async function generateObject(
     name: parsed.name || description,
     description: parsed.description || description,
     svg_path: parsed.svg_path || "",
-    width: clamp(parsed.width || 0.3, 0.02, 5.0),
-    height: clamp(parsed.height || 0.3, 0.02, 5.0),
+    width: clamp(parsed.width || 0.3, 0.2, 5.0),
+    height: clamp(parsed.height || 0.3, 0.2, 5.0),
     color: parsed.color || "#8B4513",
     mass: clamp(parsed.mass || 1, 0.1, 100),
     friction: clamp(parsed.friction || 0.5, 0, 1),

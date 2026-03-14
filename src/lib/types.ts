@@ -16,7 +16,7 @@ export interface GeneratedObject {
   restitution: number;
   density: number;
   shape_type: "polygon" | "circle" | "composite";
-  /** Vertices in meters, required for polygon shape_type */
+  /** Vertices in meters, expected/used when shape_type is polygon */
   vertices?: Array<{ x: number; y: number }>;
 }
 

@@ -91,10 +91,13 @@ export default function PhysicsCanvas({
           ctx.lineWidth = 1;
 
           const path = new Path2D(asset.svg_path);
-          // Translate to center the SVG and scale from meters to units
+          // Translate to center the SVG and scale from meters to units.
+          // lineWidth is set after scaling so that ctx.scale(SCALE, SCALE)
+          // does not magnify it; 1/SCALE produces a 1-pixel-equivalent stroke.
           ctx.save();
           ctx.translate(-toUnits(asset.width) / 2, -toUnits(asset.height) / 2);
           ctx.scale(SCALE, SCALE);
+          ctx.lineWidth = 1 / SCALE;
           ctx.fill(path);
           ctx.stroke(path);
           ctx.restore();

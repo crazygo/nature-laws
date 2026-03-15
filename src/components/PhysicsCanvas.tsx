@@ -207,12 +207,15 @@ export default function PhysicsCanvas({
       const rect = canvasRef.current?.getBoundingClientRect();
       if (!rect) return;
 
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      // Compensate for any CSS transform scale applied to the canvas wrapper
+      const scaleX = width / rect.width;
+      const scaleY = height / rect.height;
+      const x = (e.clientX - rect.left) * scaleX;
+      const y = (e.clientY - rect.top) * scaleY;
 
       addObjectToWorld(worldRef.current.engine, asset, x, y);
     },
-    [assets, presets]
+    [assets, presets, width, height]
   );
 
   return (

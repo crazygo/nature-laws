@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 interface ToolbarProps {
   onTestStability: () => void;
@@ -21,8 +21,23 @@ export default function Toolbar({
   onOpenSettings,
   onOpenVersions,
 }: ToolbarProps) {
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
+
+  // Close "More" menu when clicking outside
+  useEffect(() => {
+    const handler = (e: PointerEvent) => {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setMoreOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", handler);
+    return () => document.removeEventListener("pointerdown", handler);
+  }, []);
+
   return (
     <div className="flex items-center gap-2">
+      {/* Primary actions — always visible */}
       <button
         onClick={onTestStability}
         disabled={isTesting}
@@ -47,9 +62,10 @@ export default function Toolbar({
         💾 Save
       </button>
 
+      {/* Secondary actions — visible on desktop, hidden on mobile */}
       <button
         onClick={onOpenVersions}
-        className="px-3 py-1.5 bg-gray-700 text-white text-sm rounded-lg hover:bg-gray-600 transition-colors"
+        className="hidden md:flex px-3 py-1.5 bg-gray-700 text-white text-sm rounded-lg hover:bg-gray-600 transition-colors"
         title="View saved versions"
       >
         📋 Versions
@@ -59,7 +75,7 @@ export default function Toolbar({
 
       <button
         onClick={onClearCanvas}
-        className="px-3 py-1.5 bg-red-600/80 text-white text-sm rounded-lg hover:bg-red-500 transition-colors"
+        className="hidden md:flex px-3 py-1.5 bg-red-600/80 text-white text-sm rounded-lg hover:bg-red-500 transition-colors"
         title="Clear all objects from canvas"
       >
         🗑 Clear
@@ -67,11 +83,45 @@ export default function Toolbar({
 
       <button
         onClick={onOpenSettings}
-        className="px-3 py-1.5 bg-gray-700 text-white text-sm rounded-lg hover:bg-gray-600 transition-colors"
+        className="hidden md:flex px-3 py-1.5 bg-gray-700 text-white text-sm rounded-lg hover:bg-gray-600 transition-colors"
         title="Settings"
       >
         ⚙️
       </button>
+
+      {/* "More" button — visible on mobile only */}
+      <div className="relative md:hidden" ref={moreRef}>
+        <button
+          onClick={() => setMoreOpen((v) => !v)}
+          className="px-3 py-1.5 bg-gray-700 text-white text-sm rounded-lg hover:bg-gray-600 transition-colors"
+          aria-label="More options"
+          aria-expanded={moreOpen}
+        >
+          ···
+        </button>
+        {moreOpen && (
+          <div className="absolute right-0 bottom-full mb-1 w-40 bg-gray-800 border border-gray-700 rounded-lg shadow-lg overflow-hidden z-50">
+            <button
+              onClick={() => { onOpenVersions(); setMoreOpen(false); }}
+              className="w-full text-left px-3 py-2 text-sm text-white hover:bg-gray-700 transition-colors"
+            >
+              📋 Versions
+            </button>
+            <button
+              onClick={() => { onClearCanvas(); setMoreOpen(false); }}
+              className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-gray-700 transition-colors"
+            >
+              🗑 Clear Canvas
+            </button>
+            <button
+              onClick={() => { onOpenSettings(); setMoreOpen(false); }}
+              className="w-full text-left px-3 py-2 text-sm text-white hover:bg-gray-700 transition-colors"
+            >
+              ⚙️ Settings
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

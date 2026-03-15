@@ -18,6 +18,20 @@ export interface GeneratedObject {
   shape_type: "polygon" | "circle" | "composite";
   /** Vertices in meters, expected/used when shape_type is polygon */
   vertices?: Array<{ x: number; y: number }>;
+  /** If true, the body is immovable (static) in the physics simulation */
+  isStatic?: boolean;
+}
+
+/** A preset component available in the preset library. */
+export interface Preset extends GeneratedObject {
+  /** Category grouping for display in the preset library */
+  category: string;
+  /**
+   * When true, the special behaviour for this component is not yet implemented.
+   * The preset will be shown greyed-out with a "soon" badge and cannot be dragged
+   * onto the canvas until the behaviour is implemented.
+   */
+  pending?: boolean;
 }
 
 export interface CanvasObject {

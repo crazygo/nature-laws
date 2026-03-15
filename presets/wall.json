@@ -1,0 +1,23 @@
+{
+  "id": "preset-wall",
+  "name": "Wall",
+  "description": "Static vertical boundary",
+  "category": "structure",
+  "svg_path": "M0,0 L0.2,0 L0.2,3 L0,3 Z",
+  "width": 0.2,
+  "height": 3.0,
+  "color": "#4B5563",
+  "mass": 0,
+  "friction": 0.8,
+  "frictionStatic": 1.0,
+  "restitution": 0.0,
+  "density": 0.001,
+  "shape_type": "polygon",
+  "isStatic": true,
+  "vertices": [
+    { "x": 0, "y": 0 },
+    { "x": 0.2, "y": 0 },
+    { "x": 0.2, "y": 3.0 },
+    { "x": 0, "y": 3.0 }
+  ]
+}

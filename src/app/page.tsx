@@ -11,7 +11,8 @@ import ToastContainer from "@/components/ToastContainer";
 import SettingsModal from "@/components/SettingsModal";
 import { GeneratedObject, CanvasVersion, Toast, AIConfig, CanvasObject } from "@/lib/types";
 import { generateObject, createFallbackObject } from "@/lib/llm";
-import { PhysicsWorld, checkStability, clearWorld, addObjectToWorld } from "@/lib/physics";
+import { PhysicsWorld, checkStability, clearWorld, addObjectToWorld, ENV_BODY_LABELS } from "@/lib/physics";
+import { PRESETS } from "@/lib/presets";
 import {
   loadAssets,
   saveAssets,
@@ -174,7 +175,8 @@ export default function Home() {
         physicsWorldRef.current.engine.world
       );
       for (const b of bodies) {
-        if (b.isStatic) continue;
+        // Skip environment bodies (ground, walls); include user-placed statics (e.g. Fixed Platform)
+        if (ENV_BODY_LABELS.has(b.label)) continue;
         canvasObjects.push({
           id: crypto.randomUUID(),
           assetId: b.label,
@@ -215,7 +217,9 @@ export default function Home() {
 
       // Add all objects directly to the physics world
       for (const obj of version.objects) {
-        const asset = assets.find((a) => a.id === obj.assetId);
+        const asset =
+          assets.find((a) => a.id === obj.assetId) ??
+          PRESETS.find((p) => p.id === obj.assetId);
         if (asset) {
           addObjectToWorld(physicsWorldRef.current.engine, asset, obj.x, obj.y, {
             angle: obj.angle,
@@ -273,7 +277,7 @@ export default function Home() {
       <div className="flex-1 flex max-w-7xl mx-auto w-full">
         {/* Asset Library Sidebar */}
         <aside className="w-48 border-r border-gray-800 bg-gray-900/50">
-          <AssetLibrary assets={assets} onRemoveAsset={handleRemoveAsset} />
+          <AssetLibrary assets={assets} presets={PRESETS} onRemoveAsset={handleRemoveAsset} />
         </aside>
 
         {/* Canvas area */}
@@ -295,6 +299,7 @@ export default function Home() {
               width={CANVAS_WIDTH}
               height={CANVAS_HEIGHT}
               assets={assets}
+              presets={PRESETS}
               onWorldReady={handleWorldReady}
               droppingAsset={droppingAsset}
               onDropComplete={handleDropComplete}

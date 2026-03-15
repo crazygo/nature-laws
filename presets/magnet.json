@@ -1,0 +1,23 @@
+{
+  "id": "preset-magnet",
+  "name": "Magnet",
+  "description": "Attracts or repels specific objects by distance-based force",
+  "category": "mechanism",
+  "pending": true,
+  "svg_path": "M0,0 L0.2,0 L0.2,0.6 Q0.5,0.9 0.8,0.6 L0.8,0 L1,0 L1,0.7 Q0.5,1.1 0,0.7 Z",
+  "width": 1.0,
+  "height": 1.1,
+  "color": "#DC2626",
+  "mass": 1.0,
+  "friction": 0.5,
+  "frictionStatic": 0.5,
+  "restitution": 0.1,
+  "density": 0.005,
+  "shape_type": "polygon",
+  "vertices": [
+    { "x": 0, "y": 0 },
+    { "x": 1.0, "y": 0 },
+    { "x": 1.0, "y": 1.1 },
+    { "x": 0, "y": 1.1 }
+  ]
+}

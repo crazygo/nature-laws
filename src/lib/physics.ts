@@ -97,16 +97,19 @@ export function addObjectToWorld(
 ): Matter.Body {
   let body: Matter.Body;
 
+  const sharedOptions = {
+    label: asset.id,
+    density: asset.density,
+    friction: asset.friction,
+    frictionStatic: asset.frictionStatic,
+    restitution: asset.restitution,
+    isStatic: asset.isStatic ?? false,
+    render: { fillStyle: asset.color },
+  };
+
   if (asset.shape_type === "circle") {
     const radius = toUnits(Math.min(asset.width, asset.height) / 2);
-    body = Bodies.circle(x, y, radius, {
-      label: asset.id,
-      density: asset.density,
-      friction: asset.friction,
-      frictionStatic: asset.frictionStatic,
-      restitution: asset.restitution,
-      render: { fillStyle: asset.color },
-    });
+    body = Bodies.circle(x, y, radius, sharedOptions);
   } else if (
     asset.shape_type === "polygon" &&
     asset.vertices &&
@@ -116,23 +119,15 @@ export function addObjectToWorld(
       x: toUnits(v.x) - toUnits(asset.width) / 2,
       y: toUnits(v.y) - toUnits(asset.height) / 2,
     }));
-    body = Bodies.fromVertices(x, y, [centeredVertices], {
-      label: asset.id,
-      density: asset.density,
-      friction: asset.friction,
-      frictionStatic: asset.frictionStatic,
-      restitution: asset.restitution,
-      render: { fillStyle: asset.color },
-    });
+    body = Bodies.fromVertices(x, y, [centeredVertices], sharedOptions);
   } else {
-    body = Bodies.rectangle(x, y, toUnits(asset.width), toUnits(asset.height), {
-      label: asset.id,
-      density: asset.density,
-      friction: asset.friction,
-      frictionStatic: asset.frictionStatic,
-      restitution: asset.restitution,
-      render: { fillStyle: asset.color },
-    });
+    body = Bodies.rectangle(
+      x,
+      y,
+      toUnits(asset.width),
+      toUnits(asset.height),
+      sharedOptions
+    );
   }
 
   Composite.add(engine.world, body);
@@ -157,10 +152,14 @@ export function removeBodyFromWorld(
   Composite.remove(engine.world, body);
 }
 
+/** Labels of physics-world environment bodies that should never be saved, restored, or removed by user actions. */
+export const ENV_BODY_LABELS = new Set(["ground", "wallLeft", "wallRight"]);
+
 export function clearWorld(engine: Matter.Engine): void {
   const bodies = Composite.allBodies(engine.world);
-  const dynamicBodies = bodies.filter((b) => !b.isStatic);
-  for (const body of dynamicBodies) {
+  // Remove all bodies that are not environment bodies (dynamic and user-placed statics)
+  const removable = bodies.filter((b) => !ENV_BODY_LABELS.has(b.label));
+  for (const body of removable) {
     Composite.remove(engine.world, body);
   }
 }

@@ -7,14 +7,17 @@ import {
   addObjectToWorld,
   destroyPhysicsWorld,
   PhysicsWorld,
+  ENV_BODY_LABELS,
 } from "@/lib/physics";
-import { GeneratedObject } from "@/lib/types";
+import { GeneratedObject, Preset } from "@/lib/types";
 import { SCALE, toUnits } from "@/lib/units";
 
 interface PhysicsCanvasProps {
   width: number;
   height: number;
   assets: GeneratedObject[];
+  /** Preset objects available for drag-drop in addition to user assets. */
+  presets?: Preset[];
   onWorldReady: (world: PhysicsWorld) => void;
   droppingAsset: { asset: GeneratedObject; x: number; y: number } | null;
   onDropComplete: () => void;
@@ -24,6 +27,7 @@ export default function PhysicsCanvas({
   width,
   height,
   assets,
+  presets = [],
   onWorldReady,
   droppingAsset,
   onDropComplete,
@@ -32,11 +36,16 @@ export default function PhysicsCanvas({
   const worldRef = useRef<PhysicsWorld | null>(null);
   const renderLoopRef = useRef<number | null>(null);
   const assetsRef = useRef<GeneratedObject[]>(assets);
+  const presetsRef = useRef<Preset[]>(presets);
 
-  // Keep assetsRef in sync
+  // Keep refs in sync
   useEffect(() => {
     assetsRef.current = assets;
   }, [assets]);
+
+  useEffect(() => {
+    presetsRef.current = presets;
+  }, [presets]);
 
   // Initialize physics world and render loop
   useEffect(() => {
@@ -74,11 +83,14 @@ export default function PhysicsCanvas({
 
       // Draw all bodies
       const currentAssets = assetsRef.current;
+      const currentPresets = presetsRef.current;
+      const allObjects = [...currentAssets, ...currentPresets];
       const bodies = Matter.Composite.allBodies(worldRef.current.engine.world);
       for (const body of bodies) {
-        if (body.isStatic) continue;
+        // Skip environment static bodies (ground, walls); draw user-placed statics
+        if (ENV_BODY_LABELS.has(body.label)) continue;
 
-        const asset = currentAssets.find((a) => a.id === body.label);
+        const asset = allObjects.find((a) => a.id === body.label);
 
         ctx.save();
         ctx.translate(body.position.x, body.position.y);
@@ -136,9 +148,9 @@ export default function PhysicsCanvas({
         ctx.restore();
       }
 
-      // Draw empty state hint
-      const dynamicBodies = bodies.filter((b) => !b.isStatic);
-      if (dynamicBodies.length === 0) {
+      // Draw empty state hint — show when no user-placed bodies exist (dynamic or static preset)
+      const userBodies = bodies.filter((b) => !ENV_BODY_LABELS.has(b.label));
+      if (userBodies.length === 0) {
         ctx.fillStyle = "rgba(255,255,255,0.3)";
         ctx.font = "16px sans-serif";
         ctx.textAlign = "center";
@@ -187,7 +199,9 @@ export default function PhysicsCanvas({
       const assetId = e.dataTransfer.getData("assetId");
       if (!assetId || !worldRef.current) return;
 
-      const asset = assets.find((a) => a.id === assetId);
+      const asset =
+        assets.find((a) => a.id === assetId) ??
+        presets.find((p) => p.id === assetId);
       if (!asset) return;
 
       const rect = canvasRef.current?.getBoundingClientRect();
@@ -198,7 +212,7 @@ export default function PhysicsCanvas({
 
       addObjectToWorld(worldRef.current.engine, asset, x, y);
     },
-    [assets]
+    [assets, presets]
   );
 
   return (

@@ -1,15 +1,25 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 interface ObjectInputProps {
   onSubmit: (description: string) => void;
   isLoading: boolean;
+  /** When true, renders as a collapsed icon that opens a dialog on click (mobile mode). */
+  collapsed?: boolean;
 }
 
-export default function ObjectInput({ onSubmit, isLoading }: ObjectInputProps) {
+export default function ObjectInput({ onSubmit, isLoading, collapsed }: ObjectInputProps) {
   const [value, setValue] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Focus input when dialog opens
+  useEffect(() => {
+    if (dialogOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [dialogOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,9 +27,10 @@ export default function ObjectInput({ onSubmit, isLoading }: ObjectInputProps) {
     if (!trimmed || isLoading) return;
     onSubmit(trimmed);
     setValue("");
+    if (collapsed) setDialogOpen(false);
   };
 
-  return (
+  const form = (
     <form onSubmit={handleSubmit} className="flex gap-2">
       <input
         ref={inputRef}
@@ -46,4 +57,47 @@ export default function ObjectInput({ onSubmit, isLoading }: ObjectInputProps) {
       </button>
     </form>
   );
+
+  if (!collapsed) {
+    return form;
+  }
+
+  return (
+    <>
+      {/* Collapsed icon trigger */}
+      <button
+        onClick={() => setDialogOpen(true)}
+        className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-500 transition-colors shadow-lg"
+        aria-label="Create new object"
+        title="Create new object"
+      >
+        ✏️
+      </button>
+
+      {/* Dialog overlay */}
+      {dialogOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 px-4 pb-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setDialogOpen(false);
+          }}
+        >
+          <div className="w-full max-w-lg bg-gray-900 border border-gray-700 rounded-xl p-4 shadow-xl">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-white">Create Object</h3>
+              <button
+                onClick={() => setDialogOpen(false)}
+                className="text-gray-400 hover:text-white text-lg leading-none"
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+            {form}
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
+

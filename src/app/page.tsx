@@ -4,6 +4,7 @@ import React, { useState, useCallback, useEffect, useRef } from "react";
 import Matter from "matter-js";
 import PhysicsCanvas from "@/components/PhysicsCanvas";
 import AssetLibrary from "@/components/AssetLibrary";
+import MobileBottomDrawer from "@/components/MobileBottomDrawer";
 import ObjectInput from "@/components/ObjectInput";
 import Toolbar from "@/components/Toolbar";
 import VersionPanel from "@/components/VersionPanel";
@@ -23,6 +24,7 @@ import {
 
 const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 600;
+const PAN_STEP = 100; // canvas pixels per arrow click
 
 export default function Home() {
   const [assets, setAssets] = useState<GeneratedObject[]>([]);
@@ -40,8 +42,46 @@ export default function Home() {
     y: number;
   } | null>(null);
 
+  // Mobile canvas pan offset (in canvas pixels)
+  const [panOffset, setPanOffset] = useState(0);
+  // Measured container width for scaling
+  const [containerWidth, setContainerWidth] = useState<number>(CANVAS_WIDTH);
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
+
   const physicsWorldRef = useRef<PhysicsWorld | null>(null);
   const testIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Observe canvas container width for responsive scaling
+  useEffect(() => {
+    const container = canvasContainerRef.current;
+    if (!container) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setContainerWidth(entry.contentRect.width);
+      }
+    });
+    observer.observe(container);
+    setContainerWidth(container.clientWidth);
+    return () => observer.disconnect();
+  }, []);
+
+  // Compute canvas scale to fit the container (never upscale)
+  const canvasScale = Math.min(1, containerWidth / CANVAS_WIDTH);
+  // Max pan offset so canvas doesn't scroll past its right edge
+  const maxPan = Math.max(0, CANVAS_WIDTH - containerWidth / canvasScale);
+
+  const handlePanLeft = useCallback(() => {
+    setPanOffset((prev) => Math.max(0, prev - PAN_STEP));
+  }, []);
+
+  const handlePanRight = useCallback(() => {
+    setPanOffset((prev) => Math.min(maxPan, prev + PAN_STEP));
+  }, [maxPan]);
+
+  // Reset pan when scale changes (e.g., window resize brings canvas back into view)
+  useEffect(() => {
+    setPanOffset((prev) => Math.min(prev, maxPan));
+  }, [maxPan]);
 
   // Load persisted data
   useEffect(() => {
@@ -267,21 +307,31 @@ export default function Home() {
           <h1 className="text-xl font-bold">
             🌿 Nature Laws
           </h1>
-          <span className="text-xs text-gray-500">
-            2D Physics Stacking Game
-          </span>
+          {/* Object input icon on mobile (collapsed), subtitle on desktop */}
+          <div className="flex items-center gap-2">
+            <span className="hidden sm:inline text-xs text-gray-500">
+              2D Physics Stacking Game
+            </span>
+            <div className="md:hidden">
+              <ObjectInput
+                onSubmit={handleCreateObject}
+                isLoading={isLoading}
+                collapsed
+              />
+            </div>
+          </div>
         </div>
       </header>
 
       {/* Main content */}
-      <div className="flex-1 flex max-w-7xl mx-auto w-full">
-        {/* Asset Library Sidebar */}
-        <aside className="w-48 border-r border-gray-800 bg-gray-900/50">
+      <div className="flex-1 flex max-w-7xl mx-auto w-full min-h-0">
+        {/* Asset Library Sidebar — desktop only */}
+        <aside className="hidden md:block w-48 border-r border-gray-800 bg-gray-900/50">
           <AssetLibrary assets={assets} presets={PRESETS} onRemoveAsset={handleRemoveAsset} />
         </aside>
 
         {/* Canvas area */}
-        <main className="flex-1 flex flex-col p-4 gap-4">
+        <main className="flex-1 flex flex-col p-4 gap-4 min-w-0">
           {/* Toolbar */}
           <Toolbar
             onTestStability={handleTestStability}
@@ -293,25 +343,72 @@ export default function Home() {
             onOpenVersions={() => setVersionsOpen(true)}
           />
 
-          {/* Physics Canvas */}
-          <div className="flex-1 flex items-center justify-center">
-            <PhysicsCanvas
-              width={CANVAS_WIDTH}
-              height={CANVAS_HEIGHT}
-              assets={assets}
-              presets={PRESETS}
-              onWorldReady={handleWorldReady}
-              droppingAsset={droppingAsset}
-              onDropComplete={handleDropComplete}
-            />
+          {/* Physics Canvas with pan arrows */}
+          <div className="flex-1 flex items-start gap-2">
+            {/* Left pan arrow */}
+            <button
+              onClick={handlePanLeft}
+              disabled={panOffset <= 0}
+              className="flex-none p-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 disabled:opacity-30 transition-colors self-center"
+              aria-label="Pan canvas left"
+            >
+              ◀
+            </button>
+
+            {/* Scaled canvas container */}
+            <div
+              ref={canvasContainerRef}
+              className="flex-1 overflow-hidden"
+              style={{ height: CANVAS_HEIGHT * canvasScale }}
+            >
+              <div
+                style={{
+                  transform: `translateX(${-panOffset}px) scale(${canvasScale})`,
+                  transformOrigin: "top left",
+                  width: CANVAS_WIDTH,
+                  height: CANVAS_HEIGHT,
+                }}
+              >
+                <PhysicsCanvas
+                  width={CANVAS_WIDTH}
+                  height={CANVAS_HEIGHT}
+                  assets={assets}
+                  presets={PRESETS}
+                  onWorldReady={handleWorldReady}
+                  droppingAsset={droppingAsset}
+                  onDropComplete={handleDropComplete}
+                />
+              </div>
+            </div>
+
+            {/* Right pan arrow */}
+            <button
+              onClick={handlePanRight}
+              disabled={panOffset >= maxPan}
+              className="flex-none p-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 disabled:opacity-30 transition-colors self-center"
+              aria-label="Pan canvas right"
+            >
+              ▶
+            </button>
           </div>
 
-          {/* Object Input */}
-          <ObjectInput
-            onSubmit={handleCreateObject}
-            isLoading={isLoading}
-          />
+          {/* Object Input — desktop only (mobile uses header icon) */}
+          <div className="hidden md:block">
+            <ObjectInput
+              onSubmit={handleCreateObject}
+              isLoading={isLoading}
+            />
+          </div>
         </main>
+      </div>
+
+      {/* Mobile Bottom Drawer — mobile only */}
+      <div className="md:hidden">
+        <MobileBottomDrawer
+          assets={assets}
+          presets={PRESETS}
+          onRemoveAsset={handleRemoveAsset}
+        />
       </div>
 
       {/* Modals */}

@@ -66,6 +66,7 @@ export default function ObjectInput({ onSubmit, isLoading, collapsed }: ObjectIn
     <>
       {/* Collapsed icon trigger */}
       <button
+        type="button"
         onClick={() => setDialogOpen(true)}
         className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-500 transition-colors shadow-lg"
         aria-label="Create new object"
@@ -86,6 +87,7 @@ export default function ObjectInput({ onSubmit, isLoading, collapsed }: ObjectIn
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-white">Create Object</h3>
               <button
+                type="button"
                 onClick={() => setDialogOpen(false)}
                 className="text-gray-400 hover:text-white text-lg leading-none"
                 aria-label="Close"

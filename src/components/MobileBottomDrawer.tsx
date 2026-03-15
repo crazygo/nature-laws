@@ -8,6 +8,8 @@ interface MobileBottomDrawerProps {
   assets: GeneratedObject[];
   presets: Preset[];
   onRemoveAsset: (id: string) => void;
+  /** Called when a user taps an asset card (touch-friendly add-to-canvas). */
+  onAddToCanvas: (asset: GeneratedObject) => void;
 }
 
 type DrawerTab = "basic" | "items" | "library";
@@ -16,10 +18,12 @@ function AssetCard({
   asset,
   pending,
   onRemove,
+  onTap,
 }: {
   asset: GeneratedObject;
   pending?: boolean;
   onRemove?: () => void;
+  onTap?: () => void;
 }) {
   const handleDragStart = (e: React.DragEvent) => {
     if (pending) {
@@ -71,12 +75,13 @@ function AssetCard({
     <div
       draggable={!pending}
       onDragStart={handleDragStart}
+      onClick={!pending && onTap ? onTap : undefined}
       className={`relative bg-gray-800 rounded-lg p-2 border border-gray-700 transition-colors ${
         pending
           ? "opacity-50 cursor-not-allowed"
           : "cursor-grab active:cursor-grabbing hover:bg-gray-700 hover:border-blue-500"
       }`}
-      title={pending ? `${asset.name} — pending` : `${asset.name}\nDrag to canvas`}
+      title={pending ? `${asset.name} — pending` : `${asset.name}\nTap or drag to canvas`}
     >
       <div className="w-full aspect-square flex items-center justify-center overflow-hidden">
         <svg
@@ -90,7 +95,9 @@ function AssetCard({
       <p className="text-[10px] text-gray-300 truncate text-center mt-1">{asset.name}</p>
       {onRemove && (
         <button
-          onClick={onRemove}
+          type="button"
+          draggable={false}
+          onClick={(e) => { e.stopPropagation(); onRemove(); }}
           className="absolute top-0.5 right-0.5 w-4 h-4 bg-red-600 text-white rounded-full text-[10px] flex items-center justify-center hover:bg-red-500"
           aria-label="Remove"
         >
@@ -110,6 +117,7 @@ export default function MobileBottomDrawer({
   assets,
   presets,
   onRemoveAsset,
+  onAddToCanvas,
 }: MobileBottomDrawerProps) {
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<DrawerTab>("basic");
@@ -128,7 +136,6 @@ export default function MobileBottomDrawer({
 
   const renderGrid = () => {
     if (activeTab === "basic") {
-      // Group by category
       return (
         <div className="p-2 overflow-y-auto max-h-48">
           {BASIC_CATEGORIES.map((cat) => {
@@ -141,7 +148,12 @@ export default function MobileBottomDrawer({
                 </h3>
                 <div className="grid grid-cols-5 gap-1">
                   {items.map((preset) => (
-                    <AssetCard key={preset.id} asset={preset} pending={preset.pending} />
+                    <AssetCard
+                      key={preset.id}
+                      asset={preset}
+                      pending={preset.pending}
+                      onTap={() => onAddToCanvas(preset)}
+                    />
                   ))}
                 </div>
               </div>
@@ -164,7 +176,12 @@ export default function MobileBottomDrawer({
                 </h3>
                 <div className="grid grid-cols-5 gap-1">
                   {items.map((preset) => (
-                    <AssetCard key={preset.id} asset={preset} pending={preset.pending} />
+                    <AssetCard
+                      key={preset.id}
+                      asset={preset}
+                      pending={preset.pending}
+                      onTap={() => onAddToCanvas(preset)}
+                    />
                   ))}
                 </div>
               </div>
@@ -193,6 +210,7 @@ export default function MobileBottomDrawer({
             <AssetCard
               key={asset.id}
               asset={asset}
+              onTap={() => onAddToCanvas(asset)}
               onRemove={() => onRemoveAsset(asset.id)}
             />
           ))}
@@ -209,6 +227,7 @@ export default function MobileBottomDrawer({
       {/* Tab bar */}
       <div className="flex items-center border-t border-gray-700">
         <button
+          type="button"
           onClick={() => handleTabClick("basic")}
           className={`flex-1 py-2.5 text-xs font-medium transition-colors ${
             activeTab === "basic" && expanded
@@ -219,6 +238,7 @@ export default function MobileBottomDrawer({
           🔵 Basic
         </button>
         <button
+          type="button"
           onClick={() => handleTabClick("items")}
           className={`flex-1 py-2.5 text-xs font-medium transition-colors ${
             activeTab === "items" && expanded
@@ -229,6 +249,7 @@ export default function MobileBottomDrawer({
           ⚙️ Items
         </button>
         <button
+          type="button"
           onClick={() => handleTabClick("library")}
           className={`flex-1 py-2.5 text-xs font-medium transition-colors ${
             activeTab === "library" && expanded
@@ -239,6 +260,7 @@ export default function MobileBottomDrawer({
           📦 Library {assets.length > 0 ? `(${assets.length})` : ""}
         </button>
         <button
+          type="button"
           onClick={() => setExpanded((v) => !v)}
           className="px-3 py-2.5 text-gray-400 hover:text-gray-200 text-xs"
           aria-label={expanded ? "Collapse drawer" : "Expand drawer"}

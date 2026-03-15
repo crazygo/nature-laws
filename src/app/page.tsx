@@ -65,10 +65,9 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-  // Compute canvas scale to fit the container (never upscale)
-  const canvasScale = Math.min(1, containerWidth / CANVAS_WIDTH);
-  // Max pan offset so canvas doesn't scroll past its right edge
-  const maxPan = Math.max(0, CANVAS_WIDTH - containerWidth / canvasScale);
+  // Keep canvas at native scale; panning lets users navigate on narrow screens
+  // Max pan offset: how many canvas pixels are hidden to the right
+  const maxPan = Math.max(0, CANVAS_WIDTH - containerWidth);
 
   const handlePanLeft = useCallback(() => {
     setPanOffset((prev) => Math.max(0, prev - PAN_STEP));
@@ -291,6 +290,11 @@ export default function Home() {
     setDroppingAsset(null);
   }, []);
 
+  // Tap-to-add: places asset at the upper-centre of the canvas (mobile drawer tap)
+  const handleAddToCanvas = useCallback((asset: GeneratedObject) => {
+    setDroppingAsset({ asset, x: CANVAS_WIDTH / 2, y: CANVAS_HEIGHT / 4 });
+  }, []);
+
   const handleSaveConfig = useCallback(
     (config: AIConfig) => {
       setAiConfig(config);
@@ -359,12 +363,11 @@ export default function Home() {
             <div
               ref={canvasContainerRef}
               className="flex-1 overflow-hidden"
-              style={{ height: CANVAS_HEIGHT * canvasScale }}
+              style={{ height: CANVAS_HEIGHT }}
             >
               <div
                 style={{
-                  transform: `translateX(${-panOffset}px) scale(${canvasScale})`,
-                  transformOrigin: "top left",
+                  transform: `translateX(${-panOffset}px)`,
                   width: CANVAS_WIDTH,
                   height: CANVAS_HEIGHT,
                 }}
@@ -408,6 +411,7 @@ export default function Home() {
           assets={assets}
           presets={PRESETS}
           onRemoveAsset={handleRemoveAsset}
+          onAddToCanvas={handleAddToCanvas}
         />
       </div>
 
